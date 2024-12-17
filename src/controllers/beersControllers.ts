@@ -13,7 +13,7 @@ export const getAllBeers =
             res.status(500).json({msg: error});
         }
 
-}
+};
 
 export const createBeers = async (req: Request, res: Response): Promise<void> => {
     const { name, description, price, abv, id_brewery } = req.body;
@@ -42,7 +42,7 @@ export const createBeers = async (req: Request, res: Response): Promise<void> =>
         console.error("Erreur lors de l'insertion :", error);
 
     }
-}
+};
 
 export const deleteBeer = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
@@ -70,6 +70,17 @@ export const deleteBeer = async (req: Request, res: Response): Promise<void> => 
     }
 };
 
+    export const getDetailBeers = 
+        async (req: Request, res: Response) => {
+            const id  = parseInt(req.params.id);
+            try {
+                // récupérer la co de la bdd
+                const data = await pool.query ("SELECT * FROM beer WHERE id = $1",[id]);
+                res.status(200).json(data.rows);
+            } catch (error) {
+                res.status(404).json({msg: error});
+            }
+        };
 
 //     put: async (req: Request, res: Response) => {
 //         try {

@@ -1,6 +1,7 @@
 import express from "express";
 import beerRoutes from "./routes/beersRoutes"; // Assurez-vous du chemin correct
 import { deleteBeer } from "./controllers/beersControllers";
+// import { router as beerRoutes } from "./routes/beersRoutes";
 
 const app = express();
 
