@@ -109,7 +109,7 @@
   },
   "include": [
     "src/**/*.ts"                           // Inclure tous les fichiers .ts dans le dossier src
-  ],
+, "src/swagger.ts"  ],
   "exclude": [
     "node_modules"
   ]
