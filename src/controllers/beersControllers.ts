@@ -82,23 +82,69 @@ export const deleteBeer = async (req: Request, res: Response): Promise<void> => 
             }
         };
 
-//     put: async (req: Request, res: Response) => {
-//         try {
-
-//         res.status(201).json({data: "Ajout de la bière !!!!"});
-//     } catch (error) {
-//         res.status(200).json({msg: error});
-//     }
-//     },
-
-//     delete: async (req: Request, res: Response) => {
-//         try {
-
-//         res.status(201).json({data: "Suppression de la bière !!!!"});
-//     } catch (error) {
-//         res.status(200).json({msg: error});
-//     }
-//     },
-
-
-// };
+    export const updateBeer = async (req: Request, res: Response): Promise<void> => {
+            const id = parseInt(req.params.id); // Récupérer l'ID depuis les paramètres
+            const { name, description, price, abv, id_brewery } = req.body; // Récupérer les données à mettre à jour
+        
+            // Vérification de l'ID
+            if (isNaN(id)) {
+                res.status(400).json({ message: "L'ID doit être un nombre valide" });
+                return;
+            }
+        
+            // Vérification des données à mettre à jour
+            if (!name && !description && price === undefined && abv === undefined && !id_brewery) {
+                res.status(400).json({ message: "Aucun champ valide à mettre à jour" });
+                return;
+            }
+        
+            // Préparation de la requête SQL dynamique
+            const fieldsToUpdate: string[] = [];
+            const values: (string | number)[] = [];
+            let valueIndex = 1;
+        
+            if (name) {
+                fieldsToUpdate.push(`name = $${valueIndex++}`);
+                values.push(name);
+            }
+            if (description) {
+                fieldsToUpdate.push(`description = $${valueIndex++}`);
+                values.push(description);
+            }
+            if (price !== undefined) {
+                fieldsToUpdate.push(`price = $${valueIndex++}`);
+                values.push(price);
+            }
+            if (abv !== undefined) {
+                fieldsToUpdate.push(`abv = $${valueIndex++}`);
+                values.push(abv);
+            }
+            if (id_brewery) {
+                fieldsToUpdate.push(`id_brewery = $${valueIndex++}`);
+                values.push(id_brewery);
+            }
+        
+            values.push(id); // Ajout de l'ID en dernier pour le WHERE
+        
+            const query = `
+                UPDATE beer
+                SET ${fieldsToUpdate.join(", ")}
+                WHERE id = $${valueIndex}
+                RETURNING *;
+            `;
+        
+            try {
+                const result = await pool.query(query, values);
+        
+                if (result.rows.length === 0) {
+                    res.status(404).json({ message: "Aucune bière trouvée avec cet ID" });
+                    return;
+                }
+        
+                res.status(200).json({ message: "Bière mise à jour avec succès", beer: result.rows[0] });
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour :", error);
+                res.status(500).json({ message: "Une erreur est survenue lors de la mise à jour de la bière" });
+            }
+        };
+        
