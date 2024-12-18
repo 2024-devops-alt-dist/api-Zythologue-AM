@@ -15,11 +15,11 @@ setupSwagger(app);
 app.use(express.json());
 
 // Enregistrer les routes
-app.use("/api", beerRoutes); // Toutes les routes auront le préfixe "/api"
 
 app.delete("/api/beers/:id", deleteBeer);
 
 const version = "v1";
 const path =`/api/${version}`;
 
+app.use(`${path}/beers`, beerRoutes); // Toutes les routes auront le préfixe "/api"
 export default app;
